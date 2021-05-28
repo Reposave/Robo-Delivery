@@ -8,5 +8,9 @@ clean:
 	find -iname "*.pyc" -delete
  
 run:
-	@python3 .py
+	@python3 ValueIteration.py 10 10
+
+run_test:
+	@python3 ValueIteration.py 10 10 -start 2 3 -end 4 5 -k 2 -gamma 0.4
 	
+
