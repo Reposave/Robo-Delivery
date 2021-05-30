@@ -61,9 +61,46 @@ def main():
 	queue.append([endx,endy])
 	
 	iteration = 0
+	remaining_coords = 1 #Counts how many coordinates are left to be checked for this iteration.
+	nexti_remaining_coords = 0
 	
 	while(len(queue)!=0): #When the queue is empty, convergence has been reached.
 		
+		current_coord = queue.pop(0)
+		remaining_coords -= 1
+		
+		#Check if it's a terminal state, just add it's neighbours if it is a terminal state.
+		if(envment[current_coord[0]][current_coord[1]] != 100):
+			print('true')
+			#For now, set it to a 100.
+			envment[current_coord[0]][current_coord[1]] = 100
+		
+		if(validcoord([current_coord[0],current_coord[1]+1], width, height)): #down
+			if(envment[current_coord[0]][current_coord[1]+1] != 100):
+				queue.append([current_coord[0],current_coord[1]+1])
+				nexti_remaining_coords += 1
+				
+		if(validcoord([current_coord[0],current_coord[1]-1], width, height)): #up
+			if(envment[current_coord[0]][current_coord[1]-1] != 100):
+				queue.append([current_coord[0],current_coord[1]-1])
+				nexti_remaining_coords += 1
+				
+		if(validcoord([current_coord[0]-1,current_coord[1]], width, height)): #left
+			if(envment[current_coord[0]-1][current_coord[1]] != 100):
+				queue.append([current_coord[0]-1,current_coord[1]])
+				nexti_remaining_coords += 1
+				
+		if(validcoord([current_coord[0],current_coord[1]+1], width, height)): #right
+			if(envment[current_coord[0]][current_coord[1]+1] != 100):
+				queue.append([current_coord[0],current_coord[1]+1])
+				nexti_remaining_coords += 1
+				
+		if(remaining_coords == 0):
+			remaining_coords = nexti_remaining_coords
+			nexti_remaining_coords = 0
+			#Export environment states to records.
+	
+	print(envment)
 		
 def validcoord(coord, width, height):
 	if(coord[0]>width):
