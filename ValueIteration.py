@@ -36,15 +36,15 @@ def main():
 				g = float(sys.argv[i+1]) 
 				
 				
-	record=[[0]*width for _ in range (height)]
+	envment=[[0]*width for _ in range (height)]
 	rewards=[[[0 for _ in range(4)] for _ in range(width)] for _ in range(height)] #All set to 0.
 	
 	pprint.pprint(rewards)
 	print()
 	
-	record[endx][endy] = 100
+	envment[endx][endy] = 100
 	
-	print(record)
+	print(envment)
 	print()
 				
 	print("width: "+str(width))
@@ -57,5 +57,29 @@ def main():
 	print("g: "+str(g))
 	print()
 
+	queue = []
+	queue.append([endx,endy])
+	
+	iteration = 0
+	
+	while(len(queue)!=0): #When the queue is empty, convergence has been reached.
+		
+		
+def validcoord(coord, width, height):
+	if(coord[0]>width):
+		return False
+		
+	if(coord[1]>height):
+		return False
+	
+	if(coord[0]<0):
+		return False
+	
+	if(coord[1]<0):
+		return False
+
+	return True
+	
+		
 if __name__ == "__main__":
 	main()
