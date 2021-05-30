@@ -18,7 +18,7 @@ import numpy as np
 
 def generateAnimat(records: [[float]], start_state: (float, float), end_state: (float, float), 
 	mines: [(float, float)] = [], opt_pol: [(float, float)] = [], start_val: int = 0, end_val: int = 255, mine_val: int = 254, opt_val: int = 50,
-	fps: int = 1, vmin=0, vmax=255, generate_gif: bool = False, filename: str = 'animat', just_vals: bool = False):
+	fps: int = 24, vmin=0, vmax=255, generate_gif: bool = False, filename: str = 'animat', just_vals: bool = False):
 
 	fig, ax = plt.subplots()
 

@@ -15,3 +15,5 @@ run_test:
 	
 example:
 	@python3 Example.py
+	
+	#source ./venv/bin/activate

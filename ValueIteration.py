@@ -71,7 +71,7 @@ def main():
 	remaining_coords = 1 #Counts how many coordinates are left to be checked for this iteration.
 	nexti_remaining_coords = 0
 	
-	record = []
+	records = []
 	
 	while(len(queue)!=0): #When the queue is empty, convergence has been reached.
 		
@@ -139,7 +139,7 @@ def main():
 			remaining_coords = nexti_remaining_coords
 			nexti_remaining_coords = 0
 			#Export environment states to records.
-			record.append(copy.deepcopy(envment))
+			records.append(copy.deepcopy(envment))
 	
 	#Get optimal policy.
 	
@@ -150,7 +150,7 @@ def main():
 	while(True):
 	
 		print(start_coord)
-		opt_pol.append(start_coord)
+		opt_pol.append((start_coord[1],start_coord[0]))
 		
 		if(start_coord[0]== endy and start_coord[1] == endx):
 			break
@@ -194,13 +194,19 @@ def main():
 		
 	print(opt_pol)
 	print(envment)
-	print(record)
+	print(records)
 	
 	#Produce animation.
-	start_state = (starty, startx)
-	end_state = (endy, endx)
+	start_state = (startx, starty)
+	end_state = (endx, endy)
 	
 	mines = []
+	
+	anim, fig, ax = generateAnimat(records, start_state, end_state, mines=mines, opt_pol=opt_pol, 
+		start_val=-10, end_val=100, mine_val=150, just_vals=False, generate_gif=False,
+		vmin = -10, vmax = 150)
+
+	plt.show()
 
 def action_value(reward, discount, value):
 	return reward + (discount * value)
