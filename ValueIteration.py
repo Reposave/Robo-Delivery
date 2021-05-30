@@ -1,49 +1,61 @@
 import sys
+import pprint
 
 def main():
 	print("Welcome")
 	if(len(sys.argv)<3):
 		print("Please specify environment dimensions. ValueIteration.py width height")
 		
-		
-	width = sys.argv[1]
-	height = sys.argv[2]
+	width = int(sys.argv[1])
+	height = int(sys.argv[2])
 	
-	startx = "0"
-	starty = "0"
+	startx = 0
+	starty = 0
 	
-	endx = "1"
-	endy = "1"
+	endx = 1
+	endy = 1
 	
-	ldmine_num = "1"
+	ldmine_num = 1
 	
-	g = "0.5" #discount factor.
+	g = 0.5 #discount factor.
 	
 	if(len(sys.argv)>3):
 		for i in range(3,len(sys.argv)):
 			if(sys.argv[i] == "-start"):
-				startx = sys.argv[i+1]
-				starty = sys.argv[i+2]
+				startx = int(sys.argv[i+1])
+				starty = int(sys.argv[i+2])
 			
 			if(sys.argv[i] == "-end"):
-				endx = sys.argv[i+1]
-				endy = sys.argv[i+2]
+				endx = int(sys.argv[i+1])
+				endy = int(sys.argv[i+2])
 				
 			if(sys.argv[i] == "-k"):
-				ldmine_num = sys.argv[i+1]
+				ldmine_num = int(sys.argv[i+1])
 				
 			if(sys.argv[i] == "-gamma"):
-				g = sys.argv[i+1] 
+				g = float(sys.argv[i+1]) 
 				
-	print("width: "+width)
-	print("height: "+height)
-	print("startx: "+startx)
-	print("starty: "+starty)
-	print("endx: "+endx)
-	print("endy: "+endy)
-	print("ldmine_num: "+ldmine_num)
-	print("g: "+g)
-
+				
+	record=[[0]*width for _ in range (height)]
+	rewards=[[[0 for _ in range(4)] for _ in range(width)] for _ in range(height)] #All set to 0.
+	
+	pprint.pprint(rewards)
+	print()
+	
+	record[endx][endy] = 100
+	
+	print(record)
+	print()
+				
+	print("width: "+str(width))
+	print("height: "+str(height))
+	print("startx: "+str(startx))
+	print("starty: "+str(starty))
+	print("endx: "+str(endx))
+	print("endy: "+str(endy))
+	print("ldmine_num: "+str(ldmine_num))
+	print("g: "+str(g))
+	print()
 
 if __name__ == "__main__":
 	main()
