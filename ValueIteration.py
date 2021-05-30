@@ -139,7 +139,7 @@ def main():
 			remaining_coords = nexti_remaining_coords
 			nexti_remaining_coords = 0
 			#Export environment states to records.
-			record.append([envment])
+			record.append(copy.deepcopy(envment))
 	
 	#Get optimal policy.
 	
