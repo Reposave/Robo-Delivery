@@ -37,12 +37,16 @@ def main():
 				
 				
 	envment=[[0]*width for _ in range (height)]
-	rewards=[[[0 for _ in range(4)] for _ in range(width)] for _ in range(height)] #All set to 0.
+	rewards=[[[0 for _ in range(4)] for _ in range(width)] for _ in range(height)] # 3D Array, All set to 0.
+	#element [..][..][0] stands for UP
+	#element [..][..][1] stands for LEFT
+	#element [..][..][2] stands for RIGHT
+	#element [..][..][3] stands for DOWN
 	
 	pprint.pprint(rewards)
 	print()
 	
-	envment[endx][endy] = 100
+	envment[endy][endx] = 100
 	
 	print(envment)
 	print()
@@ -58,7 +62,7 @@ def main():
 	print()
 
 	queue = []
-	queue.append([endx,endy])
+	queue.append([endy,endx]) #y x
 	
 	iteration = 0
 	remaining_coords = 1 #Counts how many coordinates are left to be checked for this iteration.
@@ -69,31 +73,64 @@ def main():
 		current_coord = queue.pop(0)
 		remaining_coords -= 1
 		
+		prev_value = envment[current_coord[0]][current_coord[1]]
+		
 		#Check if it's a terminal state, just add it's neighbours if it is a terminal state.
 		if(envment[current_coord[0]][current_coord[1]] != 100):
 			print('true')
 			#For now, set it to a 100.
-			envment[current_coord[0]][current_coord[1]] = 100
+			results = []
+			
+			Reward = 0
+			Value = 0
+			
+			if(validcoord([current_coord[0],current_coord[1]+1], width, height)): #down
+					Reward = rewards[current_coord[0]][current_coord[1]+1][3]
+					Value = envment[current_coord[0]][current_coord[1]+1]
+					
+					results.append(action_value(Reward,g,Value))
+					
+			if(validcoord([current_coord[0],current_coord[1]-1], width, height)): #up
+					Reward = rewards[current_coord[0]][current_coord[1]-1][0]
+					Value = envment[current_coord[0]][current_coord[1]-1]
+					
+					results.append(action_value(Reward,g,Value))
+					
+			if(validcoord([current_coord[0]-1,current_coord[1]], width, height)): #left
+					Reward = rewards[current_coord[0]-1][current_coord[1]][1]
+					Value = envment[current_coord[0]-1][current_coord[1]]
+					
+					results.append(action_value(Reward,g,Value))
+					
+			if(validcoord([current_coord[0]+1,current_coord[1]], width, height)): #right
+					Reward = rewards[current_coord[0]+1][current_coord[1]][2]
+					Value = envment[current_coord[0]+1][current_coord[1]]
+					
+					results.append(action_value(Reward,g,Value))
+					
+			envment[current_coord[0]][current_coord[1]] = max(results)
+					
+		if(prev_value != envment[current_coord[0]][current_coord[1]] or envment[current_coord[0]][current_coord[1]] == 100): #If the value of the current state changed or we have just started, the neighbours may have to be updated as well.
 		
-		if(validcoord([current_coord[0],current_coord[1]+1], width, height)): #down
-			if(envment[current_coord[0]][current_coord[1]+1] != 100):
-				queue.append([current_coord[0],current_coord[1]+1])
-				nexti_remaining_coords += 1
-				
-		if(validcoord([current_coord[0],current_coord[1]-1], width, height)): #up
-			if(envment[current_coord[0]][current_coord[1]-1] != 100):
-				queue.append([current_coord[0],current_coord[1]-1])
-				nexti_remaining_coords += 1
-				
-		if(validcoord([current_coord[0]-1,current_coord[1]], width, height)): #left
-			if(envment[current_coord[0]-1][current_coord[1]] != 100):
-				queue.append([current_coord[0]-1,current_coord[1]])
-				nexti_remaining_coords += 1
-				
-		if(validcoord([current_coord[0],current_coord[1]+1], width, height)): #right
-			if(envment[current_coord[0]][current_coord[1]+1] != 100):
-				queue.append([current_coord[0],current_coord[1]+1])
-				nexti_remaining_coords += 1
+			if(validcoord([current_coord[0],current_coord[1]+1], width, height)): #down
+				if(envment[current_coord[0]][current_coord[1]+1] != 100):
+					queue.append([current_coord[0],current_coord[1]+1])
+					nexti_remaining_coords += 1
+					
+			if(validcoord([current_coord[0],current_coord[1]-1], width, height)): #up
+				if(envment[current_coord[0]][current_coord[1]-1] != 100):
+					queue.append([current_coord[0],current_coord[1]-1])
+					nexti_remaining_coords += 1
+					
+			if(validcoord([current_coord[0]-1,current_coord[1]], width, height)): #left
+				if(envment[current_coord[0]-1][current_coord[1]] != 100):
+					queue.append([current_coord[0]-1,current_coord[1]])
+					nexti_remaining_coords += 1
+					
+			if(validcoord([current_coord[0]+1,current_coord[1]], width, height)): #right
+				if(envment[current_coord[0]+1][current_coord[1]] != 100):
+					queue.append([current_coord[0]+1,current_coord[1]])
+					nexti_remaining_coords += 1
 				
 		if(remaining_coords == 0):
 			remaining_coords = nexti_remaining_coords
@@ -101,12 +138,16 @@ def main():
 			#Export environment states to records.
 	
 	print(envment)
-		
+
+def action_value(reward, discount, value):
+	return reward + (discount * value)
+			
 def validcoord(coord, width, height):
-	if(coord[0]>width):
+	print(coord)
+	if(coord[0]>height-1):
 		return False
 		
-	if(coord[1]>height):
+	if(coord[1]>width-1):
 		return False
 	
 	if(coord[0]<0):
