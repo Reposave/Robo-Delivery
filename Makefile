@@ -14,7 +14,8 @@ run_test:
 	@python3 ValueIteration.py 10 10 -start 2 3 -end 4 5 -k 7 -gamma 0.5
 
 runq:
-	@python3
+	@python3 QLearning.py 10 10 -start 2 3 -end 4 5 -k 7 -gamma 0.5 -learning 0.3 -epochs 6
+	
 example:
 	@python3 Example.py
 	

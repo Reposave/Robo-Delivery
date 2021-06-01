@@ -46,10 +46,10 @@ def main():
 				
 	envment=[[0]*width for _ in range (height)] #(0,0) is the top left corner.
 	rewards=[[[0 for _ in range(4)] for _ in range(width)] for _ in range(height)] # 3D Array, All set to 0.
-	#element [..][..][0] stands for UP
-	#element [..][..][1] stands for LEFT
-	#element [..][..][2] stands for RIGHT
-	#element [..][..][3] stands for DOWN
+	#element [..][..][1] stands for UP
+	#element [..][..][0] stands for LEFT
+	#element [..][..][3] stands for RIGHT
+	#element [..][..][2] stands for DOWN
 	
 	pprint.pprint(rewards)
 	print()
@@ -111,25 +111,25 @@ def main():
 			Value = 0
 			
 			if(validcoord([current_coord[0],current_coord[1]+1], width, height)): #right
-					Reward = rewards[current_coord[0]][current_coord[1]+1][3]
+					Reward = rewards[current_coord[0]][current_coord[1]][3]
 					Value = envment[current_coord[0]][current_coord[1]+1]
 					
 					results.append(action_value(Reward,g,Value))
 					
 			if(validcoord([current_coord[0],current_coord[1]-1], width, height)): #left
-					Reward = rewards[current_coord[0]][current_coord[1]-1][0]
+					Reward = rewards[current_coord[0]][current_coord[1]][0]
 					Value = envment[current_coord[0]][current_coord[1]-1]
 					
 					results.append(action_value(Reward,g,Value))
 					
 			if(validcoord([current_coord[0]-1,current_coord[1]], width, height)): #up
-					Reward = rewards[current_coord[0]-1][current_coord[1]][1]
+					Reward = rewards[current_coord[0]][current_coord[1]][1]
 					Value = envment[current_coord[0]-1][current_coord[1]]
 					
 					results.append(action_value(Reward,g,Value))
 					
 			if(validcoord([current_coord[0]+1,current_coord[1]], width, height)): #down
-					Reward = rewards[current_coord[0]+1][current_coord[1]][2]
+					Reward = rewards[current_coord[0]][current_coord[1]][2]
 					Value = envment[current_coord[0]+1][current_coord[1]]
 					
 					results.append(action_value(Reward,g,Value))

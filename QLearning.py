@@ -26,6 +26,8 @@ def main():
 	n = 0.3
 	e = 5
 	
+	epsilon = 0.8 #determines whether the agent favours exploration or exploitation.
+	
 	if(len(sys.argv)>3):
 		for i in range(3,len(sys.argv)):
 			if(sys.argv[i] == "-start"):
@@ -48,5 +50,87 @@ def main():
 			if(sys.argv[i] == "-learning"):
 				n = float(sys.argv[i+1])
 				
-			if(sys.argv[i] == "-epochs");
+			if(sys.argv[i] == "-epochs"):
 				e = float(sys.argv[i+1])
+				
+	envment=[[0]*width for _ in range (height)] #(0,0) is the top left corner.
+	rewards=[[[0 for _ in range(4)] for _ in range(width)] for _ in range(height)] # 3D Array, All set to 0.
+	#element [..][..][1] stands for UP
+	#element [..][..][0] stands for LEFT
+	#element [..][..][3] stands for RIGHT
+	#element [..][..][2] stands for DOWN
+	
+	
+	print()
+	coord = [endy,endx]
+	
+	#Set up rewards:
+	if(validcoord([coord[0],coord[1]+1], width, height)): #right
+		rewards[coord[0]][coord[1]+1][0] = 100 #The reward to move from the right neighbour to the left(end state) is 100.
+					
+	if(validcoord([coord[0],coord[1]-1], width, height)): #left
+		rewards[coord[0]][coord[1]-1][3] = 100
+					
+	if(validcoord([coord[0]-1,coord[1]], width, height)): #up
+		rewards[coord[0]-1][coord[1]][2] = 100
+					
+	if(validcoord([coord[0]+1,coord[1]], width, height)): #down
+		rewards[coord[0]+1][coord[1]][1] = 100
+	
+	pprint.pprint(rewards)
+	
+	#envment[endy][endx] = "0"
+	to_place = ldmine_num
+	
+	while(to_place!=0):
+		y = random.randint(0, height-1) 
+		x =	random.randint(0, width-1)
+		
+		print(y)
+		print(x)
+		
+		if(endy == y and endx == x): #Cannot place a mine on the terminal state.
+			continue			
+		elif(starty == y and startx == x):
+			continue
+			
+		if(envment[y][x]!= -50):
+			envment[y][x] = -50
+			
+		to_place-=1
+			
+	print(envment)
+	print()
+	
+	print("width: "+str(width))
+	print("height: "+str(height))
+	print("startx: "+str(startx))
+	print("starty: "+str(starty))
+	print("endx: "+str(endx))
+	print("endy: "+str(endy))
+	print("ldmine_num: "+str(ldmine_num))
+	print("g: "+str(g))
+	print()
+
+def action_value(reward, discount, value):
+	return reward + (discount * value)
+			
+def validcoord(coord, width, height):
+	#print(coord)
+	if(coord[0]>height-1):
+		return False
+		
+	if(coord[1]>width-1):
+		return False
+	
+	if(coord[0]<0):
+		return False
+	
+	if(coord[1]<0):
+		return False
+
+	return True
+	
+		
+if __name__ == "__main__":
+	main()	
