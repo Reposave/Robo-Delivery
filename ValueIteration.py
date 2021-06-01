@@ -3,11 +3,13 @@ import pprint
 import matplotlib.pyplot as plt
 from Animate import generateAnimat
 import copy
+import random
 
 def main():
 	print("Welcome")
 	if(len(sys.argv)<3):
 		print("Please specify environment dimensions. ValueIteration.py width height")
+		system.exit(0)
 		
 	width = int(sys.argv[1])
 	height = int(sys.argv[2])
@@ -34,6 +36,9 @@ def main():
 				
 			if(sys.argv[i] == "-k"):
 				ldmine_num = int(sys.argv[i+1])
+				if(ldmine_num>((width*height)-2)):
+					print("Not enough space for mines, pick a different number of mines.")
+					system.exit(0)
 				
 			if(sys.argv[i] == "-gamma"):
 				g = float(sys.argv[i+1]) 
@@ -50,7 +55,25 @@ def main():
 	print()
 	
 	envment[endy][endx] = 100
+	to_place = ldmine_num
 	
+	while(to_place!=0):
+		y = random.randint(0, height-1) 
+		x =	random.randint(0, width-1)
+		
+		print(y)
+		print(x)
+		
+		if(endy == y and endx == x): #Cannot place a mine on the terminal state.
+			continue			
+		elif(starty == y and startx == x):
+			continue
+			
+		if(envment[y][x]!= -50):
+			envment[y][x] = -50
+			
+		to_place-=1
+			
 	print(envment)
 	print()
 				
@@ -116,22 +139,22 @@ def main():
 		if(prev_value != envment[current_coord[0]][current_coord[1]] or envment[current_coord[0]][current_coord[1]] == 100): #If the value of the current state changed or we have just started, the neighbours may have to be updated as well.
 		
 			if(validcoord([current_coord[0],current_coord[1]+1], width, height)): #right
-				if(envment[current_coord[0]][current_coord[1]+1] != 100):
+				if(envment[current_coord[0]][current_coord[1]+1] != 100 and envment[current_coord[0]][current_coord[1]+1] != -50):
 					queue.append([current_coord[0],current_coord[1]+1])
 					nexti_remaining_coords += 1
 					
 			if(validcoord([current_coord[0],current_coord[1]-1], width, height)): #left
-				if(envment[current_coord[0]][current_coord[1]-1] != 100):
+				if(envment[current_coord[0]][current_coord[1]-1] != 100 and envment[current_coord[0]][current_coord[1]-1] != -50):
 					queue.append([current_coord[0],current_coord[1]-1])
 					nexti_remaining_coords += 1
 					
 			if(validcoord([current_coord[0]-1,current_coord[1]], width, height)): #up
-				if(envment[current_coord[0]-1][current_coord[1]] != 100):
+				if(envment[current_coord[0]-1][current_coord[1]] != 100 and envment[current_coord[0]-1][current_coord[1]] != -50):
 					queue.append([current_coord[0]-1,current_coord[1]])
 					nexti_remaining_coords += 1
 					
 			if(validcoord([current_coord[0]+1,current_coord[1]], width, height)): #down
-				if(envment[current_coord[0]+1][current_coord[1]] != 100):
+				if(envment[current_coord[0]+1][current_coord[1]] != 100 and envment[current_coord[0]+1][current_coord[1]] != -50):
 					queue.append([current_coord[0]+1,current_coord[1]])
 					nexti_remaining_coords += 1
 				
