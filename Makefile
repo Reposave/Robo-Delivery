@@ -29,6 +29,9 @@ runq2:
 
 runq3:
 	@python3 QLearning.py 10 10 -start 0 0 -end 9 9 -k 7 -gamma 0.5 -learning 0.9 -epochs 100
+
+runb:
+	@python3 QLearning.py 30 30 -start 0 0 -end 29 12 -k 15 -gamma 1 -learning 0.9 -epochs 100
 	
 example:
 	@python3 Example.py

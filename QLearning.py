@@ -7,7 +7,7 @@ import numpy as np
 import random
 
 def main():
-	print("Welcome")
+	print("Welcome to QLearning")
 	if(len(sys.argv)<3):
 		print("Please specify environment dimensions. QLearning.py width height")
 		system.exit(0)
@@ -25,7 +25,7 @@ def main():
 	
 	g = 0.5 #discount factor.
 	n = 0.3
-	e = 5
+	e = 50
 	
 	epsilon = 0.8 #determines whether the agent favours exploration or exploitation.
 	
@@ -123,12 +123,14 @@ def main():
 	ylower = 0
 	yupper = height -1
 	
+	print("Begin Learning")
 	while(e>0):
 		#Slowly constrain the starting point from a random state to the initial starting point.
 		xr = random.randint(xlower, xupper)
 		yr = random.randint(ylower, yupper)
 		
 		queue.append([yr,xr]) #y x
+		
 		
 		while(True):
 			start_coord = queue.pop(0)
@@ -224,13 +226,13 @@ def main():
 		episodes += 1
 		epsilon -= epsintrvls
 		records.append(copy.deepcopy(envment))
-		
+	print("Learning Complete")
 	#Get optimal policy.
 	
 	start_coord = [starty,startx]
 	opt_pol = []
 	
-	
+	print("Obtaining Optimal Policy")
 	while(True):
 		opt_pol.append((start_coord[1],start_coord[0]))
 		
@@ -264,6 +266,10 @@ def main():
 				
 				
 		direction = 0
+		if(len(valuelist)<1):
+			print("point is surrounded by mines. Please retry, Quitting...")
+			System.exit(0)
+			
 		best = np.amax(valuelist)
 		ind = np.argmax(valuelist)
 		
@@ -292,6 +298,7 @@ def main():
 			continue
 	
 	#Produce animation.
+	print("Creating Animation")
 	start_state = (startx, starty)
 	end_state = (endx, endy)
 	

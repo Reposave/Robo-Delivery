@@ -6,7 +6,7 @@ import copy
 import random
 
 def main():
-	print("Welcome")
+	print("Welcome to ValueIteration")
 	if(len(sys.argv)<3):
 		print("Please specify environment dimensions. ValueIteration.py width height")
 		system.exit(0)
@@ -92,6 +92,7 @@ def main():
 	
 	records = []
 	
+	print("Begin Learning")
 	while(len(queue)!=0): #When the queue is empty, convergence has been reached.
 		
 		current_coord = queue.pop(0)
@@ -159,8 +160,10 @@ def main():
 			nexti_remaining_coords = 0
 			#Export environment states to records.
 			records.append(copy.deepcopy(envment))
-	
+			
+	print("Learning Complete")
 	#Get optimal policy.
+	print("Obtaining Optimal Policy")
 	
 	start_coord = [starty,startx]
 	opt_pol = []
@@ -208,7 +211,8 @@ def main():
 			if(best == envment[start_coord[0]+1][start_coord[1]]):
 				start_coord = [start_coord[0]+1,start_coord[1]]
 				continue
-	
+				
+	print("Creating Animation")
 	#Produce animation.
 	start_state = (startx, starty)
 	end_state = (endx, endy)
