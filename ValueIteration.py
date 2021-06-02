@@ -51,7 +51,7 @@ def main():
 	#element [..][..][3] stands for RIGHT
 	#element [..][..][2] stands for DOWN
 	
-	pprint.pprint(rewards)
+	#pprint.pprint(rewards)
 	print()
 	
 	envment[endy][endx] = 100
@@ -60,9 +60,6 @@ def main():
 	while(to_place!=0):
 		y = random.randint(0, height-1) 
 		x =	random.randint(0, width-1)
-		
-		print(y)
-		print(x)
 		
 		if(endy == y and endx == x): #Cannot place a mine on the terminal state.
 			continue			
@@ -73,8 +70,7 @@ def main():
 			envment[y][x] = -50
 			
 		to_place-=1
-			
-	print(envment)
+
 	print()
 				
 	print("width: "+str(width))
@@ -171,8 +167,6 @@ def main():
 	
 	
 	while(True):
-	
-		print(start_coord)
 		opt_pol.append((start_coord[1],start_coord[0]))
 		
 		if(start_coord[0]== endy and start_coord[1] == endx):
@@ -214,10 +208,6 @@ def main():
 			if(best == envment[start_coord[0]+1][start_coord[1]]):
 				start_coord = [start_coord[0]+1,start_coord[1]]
 				continue
-		
-	print(opt_pol)
-	print(envment)
-	print(records)
 	
 	#Produce animation.
 	start_state = (startx, starty)

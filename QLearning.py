@@ -27,7 +27,7 @@ def main():
 	n = 0.3
 	e = 5
 	
-	epsilon = 20 #determines whether the agent favours exploration or exploitation.
+	epsilon = 0.8 #determines whether the agent favours exploration or exploitation.
 	
 	if(len(sys.argv)>3):
 		for i in range(3,len(sys.argv)):
@@ -78,17 +78,14 @@ def main():
 	if(validcoord([coord[0]+1,coord[1]], width, height)): #down
 		rewards[coord[0]+1][coord[1]][1] = 100
 	
-	pprint.pprint(rewards)
+	#pprint.pprint(rewards)
 	
-	#envment[endy][endx] = "0"
+	envment[endy][endx] = 100
 	to_place = ldmine_num
 	
 	while(to_place!=0):
 		y = random.randint(0, height-1) 
 		x =	random.randint(0, width-1)
-		
-		print(y)
-		print(x)
 		
 		if(endy == y and endx == x): #Cannot place a mine on the terminal state.
 			continue			
@@ -99,9 +96,6 @@ def main():
 			envment[y][x] = -50
 			
 		to_place-=1
-			
-	print(envment)
-	print()
 	
 	print("width: "+str(width))
 	print("height: "+str(height))
@@ -119,8 +113,9 @@ def main():
 	
 	xintrvls = (int)((width-1)/e)
 	yintrvls = (int)((height-1)/e)
-	epsintrvls = epsilon/e
+	epsintrvls = (epsilon/2)/e
 	episodes = 0
+	epconstrain = int((80/100) * e)
 	
 	xlower = 0
 	xupper = width-1
@@ -137,10 +132,7 @@ def main():
 		
 		while(True):
 			start_coord = queue.pop(0)
-			
-			print("Hi")
-			print(start_coord)
-			
+
 			if(start_coord[0] == endy and start_coord[1] == endx): #if end or mine, break.
 				break
 			elif(envment[start_coord[0]][start_coord[1]] == -50):
@@ -165,8 +157,6 @@ def main():
 				valuelist.append(envment[start_coord[0]+1][start_coord[1]])
 				paths.append(2) #down
 			
-			print("Possible actions to take")
-			print(valuelist)
 			
 			direction = 0
 			ind = np.argmax(valuelist)
@@ -179,14 +169,12 @@ def main():
 			else:
 				direction = paths[ind]
 				
-			if((random.uniform(0,1.0)) < epsilon): #Explore, else Exploit.
-				print("Explore")
+			if((random.uniform(0,1)) < epsilon): #Explore, else Exploit.
 				ind = random.randint(0, len(valuelist)-1)
 				direction = paths[ind]
 				
 			next_coord = []
 			
-			epsilon -= epsintrvls
 			
 			#Pick an action depending on epsilon.
 			if(direction == 3 ):#right
@@ -202,14 +190,8 @@ def main():
 				next_coord = [start_coord[0]+1,start_coord[1]]
 				
 			#Check Q Values of NextCoordinate.
-			print("Actions taken")
-			print(valuelist)
 			
 			valuelist.clear()
-			
-			print("cleared, Next coordinate:")
-			
-			print(next_coord)
 			
 			if(validcoord([next_coord[0],next_coord[1]+1], width, height)):
 				valuelist.append(envment[next_coord[0]][next_coord[1]+1])
@@ -223,28 +205,24 @@ def main():
 			if(validcoord([next_coord[0]+1,next_coord[1]], width, height)):
 				valuelist.append(envment[next_coord[0]+1][next_coord[1]])
 			
-			print("This is the Q values")
-			print(valuelist)
-			
 			envment[start_coord[0]][start_coord[1]] += action_value(n,rewards[start_coord[0]][start_coord[1]][direction], g, valuelist, envment[start_coord[0]][start_coord[1]])
 
 			queue.append(next_coord)
-			
-		#if(xlower!=startx):
-			#xlower+=1
-		#if(xupper!=startx):
-			#xupper-=1
-		#if(ylower!=starty):
-			#ylower+=1
-		#if(yupper!=starty):
-			#yupper-=1
+		
+		#Constrain the starting point.
+		if(episodes>epconstrain):
+			if(xlower!=startx):
+				xlower+=1
+			if(xupper!=startx):
+				xupper-=1
+			if(ylower!=starty):
+				ylower+=1
+			if(yupper!=starty):
+				yupper-=1
 			
 		e-=1 #Go to next Episode.
 		episodes += 1
-		#epsilon -= epsintrvls
-		print("episode "+ str(episodes))
-		
-		print(envment)
+		epsilon -= epsintrvls
 		records.append(copy.deepcopy(envment))
 		
 	#Get optimal policy.
@@ -325,9 +303,6 @@ def main():
 
 	plt.show()
 def action_value(n,reward, discount, value, this_val):
-	print("Action")
-	print(this_val)
-	print(np.amax(value))
 	return n*(reward + (discount * (np.amax(value) - this_val)))
 			
 def validcoord(coord, width, height):
