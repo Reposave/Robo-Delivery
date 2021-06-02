@@ -120,7 +120,6 @@ def main():
 	xintrvls = (int)((width-1)/e)
 	yintrvls = (int)((height-1)/e)
 	epsintrvls = epsilon/e
-	
 	episodes = 0
 	
 	while(e>0):
@@ -135,7 +134,7 @@ def main():
 				break
 			elif(envment[start_coord[0]][start_coord[1]] == -50):
 				break
-			
+				
 			valuelist = []
 			paths = []
 			#Find Possible actions to take.
@@ -154,17 +153,25 @@ def main():
 			if(validcoord([start_coord[0]+1,start_coord[1]], width, height)):
 				valuelist.append(envment[start_coord[0]+1][start_coord[1]])
 				paths.append(2) #down
-				
+			
 			direction = 0
 			ind = np.argmax(valuelist)
-			
-			if(random.uniform(0,1) > epsilon): #Exploit
+			best = np.amax(valuelist)
+		
+			found = np.where(valuelist == best)[0]	
+		
+			if(len(found)>1): #Multiple similar Q values.
+				direction = paths[found[random.randint(0,len(found)-1)]]
+			else:
 				direction = paths[ind]
-			else:					   #Explore
+				
+			if((random.uniform(0,1)) < epsilon): #Explore, else Exploit.
 				ind = random.randint(0, len(valuelist)-1)
 				direction = paths[ind]
 				
 			next_coord = []
+			
+			epsilon -= epsintrvls
 			
 			#Pick an action depending on epsilon. If some states have the same Q value, the agent may traverse to a different state from the one picked but that is okay since it will still be picking the best state or a random state.
 			print(direction)
@@ -199,15 +206,16 @@ def main():
 			if(validcoord([next_coord[0]+1,next_coord[1]], width, height)):
 				valuelist.append(envment[next_coord[0]+1][next_coord[1]])
 					
-			envment[start_coord[0]][start_coord[1]] += action_value(n,rewards[start_coord[0]][start_coord[1]][direction], g, valuelist, envment[start_coord[0]][start_coord[1]]) 
-			
+			envment[start_coord[0]][start_coord[1]] += action_value(n,rewards[start_coord[0]][start_coord[1]][direction], g, valuelist, envment[start_coord[0]][start_coord[1]])
+				
 			queue.append(next_coord)
 			print(next_coord)
 			
 		e-=1 #Go to next Episode.
 		episodes += 1
-		print("episode "+ str(episodes))
 		epsilon -= epsintrvls
+		print("episode "+ str(episodes))
+		
 		records.append(copy.deepcopy(envment))
 		
 	#Get optimal policy.
@@ -224,43 +232,65 @@ def main():
 		if(start_coord[0]== endy and start_coord[1] == endx):
 			break
 			
+		paths = []	
+		
 		#print(envment[start_coord[0]][start_coord[1]+1],envment[start_coord[0]][start_coord[1]-1],envment[start_coord[0]-1][start_coord[1]],envment[start_coord[0]+1][start_coord[1]])
 		valuelist = []
 		
 		if(validcoord([start_coord[0],start_coord[1]+1], width, height)):
-			valuelist.append(envment[start_coord[0]][start_coord[1]+1])
+			if(envment[start_coord[0]][start_coord[1]+1]!=-50):
+				valuelist.append(envment[start_coord[0]][start_coord[1]+1])
+				paths.append(3) #right
 			
 		if(validcoord([start_coord[0],start_coord[1]-1], width, height)):
-			valuelist.append(envment[start_coord[0]][start_coord[1]-1])
-			
-		if(validcoord([start_coord[0]-1,start_coord[1]], width, height)):
-			valuelist.append(envment[start_coord[0]-1][start_coord[1]])
-			
-		if(validcoord([start_coord[0]+1,start_coord[1]], width, height)):
-			valuelist.append(envment[start_coord[0]+1][start_coord[1]])
+			if(envment[start_coord[0]][start_coord[1]-1]!=-50):
+				valuelist.append(envment[start_coord[0]][start_coord[1]-1])
+				paths.append(0) #left
 				
-		best = max(valuelist)
-		
-		if(validcoord([start_coord[0],start_coord[1]+1], width, height)):
-			if(best == envment[start_coord[0]][start_coord[1]+1]):
-				start_coord = [start_coord[0],start_coord[1]+1]
-				continue
-		
-		if(validcoord([start_coord[0],start_coord[1]-1], width, height)):
-			if(best == envment[start_coord[0]][start_coord[1]-1]):
-				start_coord = [start_coord[0],start_coord[1]-1]
-				continue
-		
 		if(validcoord([start_coord[0]-1,start_coord[1]], width, height)):
-			if(best == envment[start_coord[0]-1][start_coord[1]]):
-				start_coord = [start_coord[0]-1,start_coord[1]]
-				continue
-		
+			if(envment[start_coord[0]-1][start_coord[1]]!=-50):
+				valuelist.append(envment[start_coord[0]-1][start_coord[1]])
+				paths.append(1) #up
+			
 		if(validcoord([start_coord[0]+1,start_coord[1]], width, height)):
-			if(best == envment[start_coord[0]+1][start_coord[1]]):
-				start_coord = [start_coord[0]+1,start_coord[1]]
-				continue
+			if(envment[start_coord[0]+1][start_coord[1]]!=-50):
+				valuelist.append(envment[start_coord[0]+1][start_coord[1]])
+				paths.append(2) #down
+				
+				
+		direction = 0
+		best = np.amax(valuelist)
+		ind = np.argmax(valuelist)
 		
+		found = np.where(valuelist == best)[0]	
+		
+		if(len(found)>1): #Multiple similar Q values.
+			direction = paths[found[random.randint(0,len(found)-1)]]
+		else:
+			direction = paths[ind]
+	
+			#Pick an action depending on epsilon. If some states have the same Q value, the agent may traverse to a different state from the one picked but that is okay since it will still be picking the best state or a random state.
+		print(direction)
+		if(direction == 3 ):#right
+			print(3)
+			start_coord = [start_coord[0],start_coord[1]+1]
+			continue
+				
+		if(direction == 0 ):#left
+			print(0)
+			start_coord = [start_coord[0],start_coord[1]-1]
+			continue
+				
+		if(direction == 1 ):#up
+			print(1)
+			start_coord = [start_coord[0]-1,start_coord[1]]
+			continue
+				
+		if(direction == 2 ):#down
+			print(2)
+			start_coord = [start_coord[0]+1,start_coord[1]]
+			continue
+
 	print(opt_pol)
 	print(envment)
 	print(records)
