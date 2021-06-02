@@ -3,6 +3,7 @@ import pprint
 import matplotlib.pyplot as plt
 from Animate import generateAnimat
 import copy
+import numpy as np
 import random
 
 def main():
@@ -111,9 +112,172 @@ def main():
 	print("ldmine_num: "+str(ldmine_num))
 	print("g: "+str(g))
 	print()
+	
+	#Begin Q-Learning.
+	queue = []
+	records = []
+	
+	xintrvls = (int)((width-1)/e)
+	yintrvls = (int)((height-1)/e)
+	epsintrvls = epsilon/e
+	
+	episodes = 0
+	
+	while(e>0):
+		xr = random.randint(0, (width-1)-(xintrvls*episodes))
+		yr = random.randint(0, (height-1)-(yintrvls*episodes))
+		queue.append([yr,xr]) #y x
+		
+		while(True):
+			start_coord = queue.pop(0)
+			
+			if(start_coord[0] == endy and start_coord[1] == endx): #if end or mine, break.
+				break
+			elif(envment[start_coord[0]][start_coord[1]] == -50):
+				break
+			
+			valuelist = []
+			paths = []
+			#Find Possible actions to take.
+			if(validcoord([start_coord[0],start_coord[1]+1], width, height)):
+				valuelist.append(envment[start_coord[0]][start_coord[1]+1])
+				paths.append(3) #right
+				
+			if(validcoord([start_coord[0],start_coord[1]-1], width, height)):
+				valuelist.append(envment[start_coord[0]][start_coord[1]-1])
+				paths.append(0) #left
+			
+			if(validcoord([start_coord[0]-1,start_coord[1]], width, height)):
+				valuelist.append(envment[start_coord[0]-1][start_coord[1]])
+				paths.append(1) #up
+				
+			if(validcoord([start_coord[0]+1,start_coord[1]], width, height)):
+				valuelist.append(envment[start_coord[0]+1][start_coord[1]])
+				paths.append(2) #down
+				
+			direction = 0
+			ind = np.argmax(valuelist)
+			
+			if(random.uniform(0,1) > epsilon): #Exploit
+				direction = paths[ind]
+			else:					   #Explore
+				ind = random.randint(0, len(valuelist)-1)
+				direction = paths[ind]
+				
+			next_coord = []
+			
+			#Pick an action depending on epsilon. If some states have the same Q value, the agent may traverse to a different state from the one picked but that is okay since it will still be picking the best state or a random state.
+			print(direction)
+			if(direction == 3 ):#right
+				print(3)
+				next_coord = [start_coord[0],start_coord[1]+1]
+				
+			if(direction == 0 ):#left
+				print(0)
+				next_coord = [start_coord[0],start_coord[1]-1]
+				
+			if(direction == 1 ):#up
+				print(1)
+				next_coord = [start_coord[0]-1,start_coord[1]]
+				
+			if(direction == 2 ):#down
+				print(2)
+				next_coord = [start_coord[0]+1,start_coord[1]]
+				
+			#Check Q Values of NextCoordinate.
+			valuelist.clear()
+			
+			if(validcoord([next_coord[0],next_coord[1]+1], width, height)):
+				valuelist.append(envment[next_coord[0]][next_coord[1]+1])
+				
+			if(validcoord([next_coord[0],next_coord[1]-1], width, height)):
+				valuelist.append(envment[next_coord[0]][next_coord[1]-1])
+				
+			if(validcoord([next_coord[0]-1,next_coord[1]], width, height)):
+				valuelist.append(envment[next_coord[0]-1][next_coord[1]])
+				
+			if(validcoord([next_coord[0]+1,next_coord[1]], width, height)):
+				valuelist.append(envment[next_coord[0]+1][next_coord[1]])
+					
+			envment[start_coord[0]][start_coord[1]] += action_value(n,rewards[start_coord[0]][start_coord[1]][direction], g, valuelist, envment[start_coord[0]][start_coord[1]]) 
+			
+			queue.append(next_coord)
+			print(next_coord)
+			
+		e-=1 #Go to next Episode.
+		episodes += 1
+		print("episode "+ str(episodes))
+		epsilon -= epsintrvls
+		records.append(copy.deepcopy(envment))
+		
+	#Get optimal policy.
+	
+	start_coord = [starty,startx]
+	opt_pol = []
+	
+	
+	while(True):
+	
+		print(start_coord)
+		opt_pol.append((start_coord[1],start_coord[0]))
+		
+		if(start_coord[0]== endy and start_coord[1] == endx):
+			break
+			
+		#print(envment[start_coord[0]][start_coord[1]+1],envment[start_coord[0]][start_coord[1]-1],envment[start_coord[0]-1][start_coord[1]],envment[start_coord[0]+1][start_coord[1]])
+		valuelist = []
+		
+		if(validcoord([start_coord[0],start_coord[1]+1], width, height)):
+			valuelist.append(envment[start_coord[0]][start_coord[1]+1])
+			
+		if(validcoord([start_coord[0],start_coord[1]-1], width, height)):
+			valuelist.append(envment[start_coord[0]][start_coord[1]-1])
+			
+		if(validcoord([start_coord[0]-1,start_coord[1]], width, height)):
+			valuelist.append(envment[start_coord[0]-1][start_coord[1]])
+			
+		if(validcoord([start_coord[0]+1,start_coord[1]], width, height)):
+			valuelist.append(envment[start_coord[0]+1][start_coord[1]])
+				
+		best = max(valuelist)
+		
+		if(validcoord([start_coord[0],start_coord[1]+1], width, height)):
+			if(best == envment[start_coord[0]][start_coord[1]+1]):
+				start_coord = [start_coord[0],start_coord[1]+1]
+				continue
+		
+		if(validcoord([start_coord[0],start_coord[1]-1], width, height)):
+			if(best == envment[start_coord[0]][start_coord[1]-1]):
+				start_coord = [start_coord[0],start_coord[1]-1]
+				continue
+		
+		if(validcoord([start_coord[0]-1,start_coord[1]], width, height)):
+			if(best == envment[start_coord[0]-1][start_coord[1]]):
+				start_coord = [start_coord[0]-1,start_coord[1]]
+				continue
+		
+		if(validcoord([start_coord[0]+1,start_coord[1]], width, height)):
+			if(best == envment[start_coord[0]+1][start_coord[1]]):
+				start_coord = [start_coord[0]+1,start_coord[1]]
+				continue
+		
+	print(opt_pol)
+	print(envment)
+	print(records)
+	
+	#Produce animation.
+	start_state = (startx, starty)
+	end_state = (endx, endy)
+	
+	mines = []
+	
+	anim, fig, ax = generateAnimat(records, start_state, end_state, mines=mines, opt_pol=opt_pol, 
+		start_val=-10, end_val=100, mine_val=150, just_vals=False, generate_gif=False,
+		vmin = -10, vmax = 150)
 
-def action_value(reward, discount, value):
-	return reward + (discount * value)
+	plt.show()
+def action_value(n,reward, discount, value, this_val):
+	return n*(reward + (discount * (max(value) - this_val)))
 			
 def validcoord(coord, width, height):
 	#print(coord)
