@@ -27,7 +27,7 @@ def main():
 	n = 0.3
 	e = 5
 	
-	epsilon = 0.8 #determines whether the agent favours exploration or exploitation.
+	epsilon = 20 #determines whether the agent favours exploration or exploitation.
 	
 	if(len(sys.argv)>3):
 		for i in range(3,len(sys.argv)):
@@ -122,13 +122,24 @@ def main():
 	epsintrvls = epsilon/e
 	episodes = 0
 	
+	xlower = 0
+	xupper = width-1
+	
+	ylower = 0
+	yupper = height -1
+	
 	while(e>0):
-		xr = random.randint(0, (width-1)-(xintrvls*episodes))
-		yr = random.randint(0, (height-1)-(yintrvls*episodes))
+		#Slowly constrain the starting point from a random state to the initial starting point.
+		xr = random.randint(xlower, xupper)
+		yr = random.randint(ylower, yupper)
+		
 		queue.append([yr,xr]) #y x
 		
 		while(True):
 			start_coord = queue.pop(0)
+			
+			print("Hi")
+			print(start_coord)
 			
 			if(start_coord[0] == endy and start_coord[1] == endx): #if end or mine, break.
 				break
@@ -154,6 +165,9 @@ def main():
 				valuelist.append(envment[start_coord[0]+1][start_coord[1]])
 				paths.append(2) #down
 			
+			print("Possible actions to take")
+			print(valuelist)
+			
 			direction = 0
 			ind = np.argmax(valuelist)
 			best = np.amax(valuelist)
@@ -165,7 +179,8 @@ def main():
 			else:
 				direction = paths[ind]
 				
-			if((random.uniform(0,1)) < epsilon): #Explore, else Exploit.
+			if((random.uniform(0,1.0)) < epsilon): #Explore, else Exploit.
+				print("Explore")
 				ind = random.randint(0, len(valuelist)-1)
 				direction = paths[ind]
 				
@@ -173,26 +188,28 @@ def main():
 			
 			epsilon -= epsintrvls
 			
-			#Pick an action depending on epsilon. If some states have the same Q value, the agent may traverse to a different state from the one picked but that is okay since it will still be picking the best state or a random state.
-			print(direction)
+			#Pick an action depending on epsilon.
 			if(direction == 3 ):#right
-				print(3)
 				next_coord = [start_coord[0],start_coord[1]+1]
 				
 			if(direction == 0 ):#left
-				print(0)
 				next_coord = [start_coord[0],start_coord[1]-1]
 				
 			if(direction == 1 ):#up
-				print(1)
 				next_coord = [start_coord[0]-1,start_coord[1]]
 				
 			if(direction == 2 ):#down
-				print(2)
 				next_coord = [start_coord[0]+1,start_coord[1]]
 				
 			#Check Q Values of NextCoordinate.
+			print("Actions taken")
+			print(valuelist)
+			
 			valuelist.clear()
+			
+			print("cleared, Next coordinate:")
+			
+			print(next_coord)
 			
 			if(validcoord([next_coord[0],next_coord[1]+1], width, height)):
 				valuelist.append(envment[next_coord[0]][next_coord[1]+1])
@@ -205,17 +222,29 @@ def main():
 				
 			if(validcoord([next_coord[0]+1,next_coord[1]], width, height)):
 				valuelist.append(envment[next_coord[0]+1][next_coord[1]])
-					
+			
+			print("This is the Q values")
+			print(valuelist)
+			
 			envment[start_coord[0]][start_coord[1]] += action_value(n,rewards[start_coord[0]][start_coord[1]][direction], g, valuelist, envment[start_coord[0]][start_coord[1]])
-				
+
 			queue.append(next_coord)
-			print(next_coord)
+			
+		#if(xlower!=startx):
+			#xlower+=1
+		#if(xupper!=startx):
+			#xupper-=1
+		#if(ylower!=starty):
+			#ylower+=1
+		#if(yupper!=starty):
+			#yupper-=1
 			
 		e-=1 #Go to next Episode.
 		episodes += 1
-		epsilon -= epsintrvls
+		#epsilon -= epsintrvls
 		print("episode "+ str(episodes))
 		
+		print(envment)
 		records.append(copy.deepcopy(envment))
 		
 	#Get optimal policy.
@@ -225,8 +254,6 @@ def main():
 	
 	
 	while(True):
-	
-		print(start_coord)
 		opt_pol.append((start_coord[1],start_coord[0]))
 		
 		if(start_coord[0]== endy and start_coord[1] == endx):
@@ -270,30 +297,21 @@ def main():
 			direction = paths[ind]
 	
 			#Pick an action depending on epsilon. If some states have the same Q value, the agent may traverse to a different state from the one picked but that is okay since it will still be picking the best state or a random state.
-		print(direction)
 		if(direction == 3 ):#right
-			print(3)
 			start_coord = [start_coord[0],start_coord[1]+1]
 			continue
 				
 		if(direction == 0 ):#left
-			print(0)
 			start_coord = [start_coord[0],start_coord[1]-1]
 			continue
 				
 		if(direction == 1 ):#up
-			print(1)
 			start_coord = [start_coord[0]-1,start_coord[1]]
 			continue
 				
 		if(direction == 2 ):#down
-			print(2)
 			start_coord = [start_coord[0]+1,start_coord[1]]
 			continue
-
-	print(opt_pol)
-	print(envment)
-	print(records)
 	
 	#Produce animation.
 	start_state = (startx, starty)
@@ -307,7 +325,10 @@ def main():
 
 	plt.show()
 def action_value(n,reward, discount, value, this_val):
-	return n*(reward + (discount * (max(value) - this_val)))
+	print("Action")
+	print(this_val)
+	print(np.amax(value))
+	return n*(reward + (discount * (np.amax(value) - this_val)))
 			
 def validcoord(coord, width, height):
 	#print(coord)
